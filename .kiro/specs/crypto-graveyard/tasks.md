@@ -49,7 +49,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: each state renders without data; no layout shift when switching among them.
     - _Requirements: 3.2, 7.2, 7.3_
 
-- [ ] 7. Build the TombstoneCard component
+- [x] 7. Build the TombstoneCard component
     - Create `src/components/TombstoneCard.tsx` accepting a `BuriedToken` and an `onOpen` callback.
     - Render name, symbol, chain, peak price (USD), current price (USD) or "price unknown", drop % from peak, date of death, and cause.
     - Apply distinct styling per `cause` (rugged / abandoned / -99%) — icon, accent color, and an epitaph from `lore` — using the theme tokens from task 5.

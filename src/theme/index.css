@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 /*
- * Crypto Graveyard — base theme.
+ * Crypto Graveyard — theme (Requirements 5.1, 5.3).
  *
- * Defines the dark graveyard palette (near-black background, muted stone text)
- * as CSS variables for direct use and mirrors the Tailwind `graveyard` color
- * tokens. The fog-drift and candle-flicker keyframes are left as no-op
- * placeholders here and finalized in task 5 (with a prefers-reduced-motion
- * guard).
+ * Dark graveyard palette (near-black background, muted stone text), reusable
+ * component classes for the fog overlay, candle motif, and tombstone card
+ * shape, plus per-cause accent tokens. The fog-drift and candle-flicker
+ * keyframes are finalized here; a prefers-reduced-motion media query disables
+ * both so the atmosphere stays static for users who opt out of motion.
  */
 
 :root {
@@ -23,6 +23,15 @@
   --stone: #9ca3a0;
   --stone-light: #c8ccc7;
   --stone-dim: #6b7270;
+
+  /* Per-cause accent colors (rugged / abandoned / -99%). The `*-soft` variants
+     meet WCAG AA contrast for text/labels against the near-black background. */
+  --cause-rugged: #c0392b;
+  --cause-rugged-soft: #e07a6e;
+  --cause-abandoned: #7c8a6b;
+  --cause-abandoned-soft: #aec59a;
+  --cause-99: #c9a227;
+  --cause-99-soft: #e8c860;
 }
 
 @layer base {
@@ -42,24 +51,175 @@
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* Keyframe placeholders — finalized in task 5 (fog + candle motion).  */
-/* Reduced-motion guard is added in task 5 alongside the real frames. */
-/* ------------------------------------------------------------------ */
+@layer components {
+  /* ----- Fog overlay (Requirement 5.1) ----- */
+  /* Fixed, full-viewport, non-interactive mist layered behind content. */
+  .fog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* Each layer is a 200%-wide repeating mist tile; fog-drift shifts it by one
+     tile (50% of the layer) so the loop is seamless, and the layers parallax at
+     different speeds/directions for depth. */
+  .fog-layer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 200%;
+    background-repeat: repeat-x;
+    background-size: 50% 100%;
+    animation: fog-drift 90s linear infinite;
+    will-change: transform;
+  }
+  .fog-layer--back {
+    height: 60vh;
+    opacity: 0.22;
+    filter: blur(3px);
+    background-image:
+      radial-gradient(ellipse 320px 170px at 18% 72%, rgba(220, 224, 226, 0.55), transparent 70%),
+      radial-gradient(ellipse 280px 140px at 55% 60%, rgba(204, 210, 212, 0.45), transparent 70%),
+      radial-gradient(ellipse 360px 190px at 86% 78%, rgba(214, 218, 220, 0.4), transparent 72%);
+    animation-duration: 120s;
+  }
+  .fog-layer--mid {
+    height: 45vh;
+    opacity: 0.18;
+    filter: blur(1.5px);
+    background-image:
+      radial-gradient(ellipse 240px 130px at 30% 66%, rgba(214, 218, 220, 0.5), transparent 70%),
+      radial-gradient(ellipse 200px 110px at 70% 58%, rgba(198, 204, 206, 0.42), transparent 70%);
+    animation-duration: 75s;
+    animation-direction: reverse;
+  }
+  .fog-layer--front {
+    height: 30vh;
+    opacity: 0.14;
+    background-image:
+      radial-gradient(ellipse 180px 100px at 25% 60%, rgba(224, 228, 230, 0.5), transparent 70%),
+      radial-gradient(ellipse 220px 120px at 78% 72%, rgba(206, 212, 214, 0.4), transparent 72%);
+    animation-duration: 45s;
+  }
+
+  /* ----- Candle motif (Requirement 5.1) ----- */
+  .candle {
+    position: relative;
+    width: 18px;
+    height: 96px;
+    display: inline-block;
+  }
+  .candle__body {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 70px;
+    background: linear-gradient(90deg, #cabfa9, #efe7d6 42%, #cabfa9);
+    border-radius: 4px 4px 2px 2px;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.18);
+  }
+  .candle__wick {
+    position: absolute;
+    left: 50%;
+    bottom: 70px;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 6px;
+    background: #2a2422;
+  }
+  .candle__flame {
+    position: absolute;
+    left: 50%;
+    bottom: 76px;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 18px;
+    background: radial-gradient(
+      ellipse at 50% 72%,
+      #ffe9a8 0%,
+      #ffb347 38%,
+      #ff7b2e 62%,
+      transparent 76%
+    );
+    border-radius: 50% 50% 50% 50% / 72% 72% 40% 40%;
+    filter: drop-shadow(0 0 6px rgba(255, 160, 60, 0.7));
+    transform-origin: bottom center;
+    animation: candle-flicker 2.4s ease-in-out infinite;
+  }
+
+  /* ----- Tombstone card shape (reused by TombstoneCard in task 7) ----- */
+  .tombstone-card {
+    position: relative;
+    /* Arched top, near-flat base — reads as a headstone silhouette. */
+    border-radius: 1.5rem 1.5rem 0.375rem 0.375rem;
+    border: 1px solid var(--graveyard-border);
+    background: linear-gradient(180deg, var(--graveyard-surface), var(--graveyard-surface-2));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 10px 24px rgba(0, 0, 0, 0.5);
+  }
+
+  /* ----- Cause accent helpers (reused by TombstoneCard in task 7) -----
+     Set the `--cause-accent` / `--cause-accent-soft` tokens on a card so its
+     border, icon, and epitaph tint per cause. */
+  .cause-accent-rugged {
+    --cause-accent: var(--cause-rugged);
+    --cause-accent-soft: var(--cause-rugged-soft);
+  }
+  .cause-accent-abandoned {
+    --cause-accent: var(--cause-abandoned);
+    --cause-accent-soft: var(--cause-abandoned-soft);
+  }
+  .cause-accent-99 {
+    --cause-accent: var(--cause-99);
+    --cause-accent-soft: var(--cause-99-soft);
+  }
+}
+
+/* ----- Atmosphere keyframes (Requirement 5.1) ----- */
 @keyframes fog-drift {
   from {
-    opacity: 1;
+    transform: translateX(0);
   }
   to {
-    opacity: 1;
+    transform: translateX(-50%);
   }
 }
 
 @keyframes candle-flicker {
-  from {
+  0% {
+    transform: translateX(-50%) scale(1) rotate(-1deg);
+    opacity: 0.95;
+  }
+  25% {
+    transform: translateX(-50%) scale(1.06) rotate(1deg);
     opacity: 1;
   }
-  to {
-    opacity: 1;
+  50% {
+    transform: translateX(-50%) scale(0.96) rotate(-1.5deg);
+    opacity: 0.86;
+  }
+  75% {
+    transform: translateX(-50%) scale(1.04) rotate(0.6deg);
+    opacity: 0.97;
+  }
+  100% {
+    transform: translateX(-50%) scale(1) rotate(-1deg);
+    opacity: 0.95;
+  }
+}
+
+/* ----- Reduced motion (Requirement 5.3) -----
+   Disables fog drift and candle flicker so the atmosphere renders static. */
+@media (prefers-reduced-motion: reduce) {
+  .fog-layer {
+    animation: none;
+  }
+  .candle__flame {
+    animation: none;
   }
 }

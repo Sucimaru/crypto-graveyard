@@ -35,7 +35,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: `npm run test` (or the chosen runner) passes.
     - _Requirements: 1.3, 2.2, 4.2_
 
-- [ ] 5. Build the graveyard atmosphere (dark theme, fog, candles)
+- [x] 5. Build the graveyard atmosphere (dark theme, fog, candles)
     - Finalize `src/theme/index.css`: define keyframes for `fog-drift` and `candle-flicker` and a reduced-motion media query (`@media (prefers-reduced-motion: reduce)`) that disables both.
     - Create `src/components/Fog.tsx` (a layered, animated fog overlay) and `src/components/Candle.tsx` (a flickering candle motif) that respect the reduced-motion query.
     - Establish reusable Tailwind utility classes / CSS variables for the dark palette, tombstone card shape, and cause accent colors.

@@ -27,9 +27,15 @@ export interface PriceChartProps {
   points: PricePoint[];
   /** Curated peak price, or null/undefined when unknown. */
   peakPriceUsd?: number | null;
+  /**
+   * Overrides the accessible name when the chart is NOT a live 24h series —
+   * e.g. the illustrative peak-to-zero decline for a pair-gone token, where
+   * the default "Price over the last 24 hours" wording would be wrong.
+   */
+  accessibleLabel?: string;
 }
 
-export function PriceChart({ points, peakPriceUsd }: PriceChartProps) {
+export function PriceChart({ points, peakPriceUsd, accessibleLabel }: PriceChartProps) {
   const valid = points.filter(
     (p): p is { t: number; price: number } =>
       p.price != null && Number.isFinite(p.price),
@@ -38,7 +44,8 @@ export function PriceChart({ points, peakPriceUsd }: PriceChartProps) {
   const peak =
     peakPriceUsd != null && Number.isFinite(peakPriceUsd) ? peakPriceUsd : null;
   const peakLabel = peak != null ? formatUsd(peak) : 'unknown';
-  const accessibleName = `Price over the last 24 hours, peak ${peakLabel}`;
+  const accessibleName =
+    accessibleLabel ?? `Price over the last 24 hours, peak ${peakLabel}`;
 
   if (valid.length === 0) {
     return (

@@ -61,13 +61,19 @@ export interface TombstoneCardProps {
 export function TombstoneCard({ token, onOpen }: TombstoneCardProps) {
   const grave = token.token;
   const cause = CAUSE_CONFIG[grave.cause];
-  const dropLabel =
-    token.dropFromPeakPct !== undefined ? `${token.dropFromPeakPct.toFixed(1)}%` : '—';
+  const isPairGone = token.status === 'pair-gone';
+  const dropLabel = isPairGone
+    ? '≈ -100%'
+    : token.dropFromPeakPct !== undefined
+      ? `${token.dropFromPeakPct.toFixed(1)}%`
+      : '—';
   const currentLabel =
     token.status === 'live' && token.currentPriceUsd !== undefined
       ? formatUsd(token.currentPriceUsd)
-      : 'price unknown';
-  const ariaLabel = `${grave.name} (${grave.symbol}), ${cause.label}, down ${dropLabel} from peak ${formatUsd(grave.peakPriceUsd)}, died ${formatDateOfDeath(grave.dateOfDeath)}`;
+      : isPairGone
+        ? 'pair gone'
+        : 'price unknown';
+  const ariaLabel = `${grave.name} (${grave.symbol}), ${cause.label}, down ${dropLabel} from peak ${formatUsd(grave.peakPriceUsd)}, died ${formatDateOfDeath(grave.dateOfDeath)}${isPairGone ? ', pair gone, no live market' : ''}`;
 
   return (
     <button
@@ -99,6 +105,11 @@ export function TombstoneCard({ token, onOpen }: TombstoneCardProps) {
       <span className="text-sm text-[var(--graveyard-text-dim)]">
         Now <span className="text-[var(--graveyard-text)]">{currentLabel}</span>
       </span>
+      {isPairGone ? (
+        <span className="text-xs text-[var(--graveyard-text-dim)]">
+          pair gone — no live market
+        </span>
+      ) : null}
       <span className="text-xs text-[var(--graveyard-text-dim)]">
         Died {formatDateOfDeath(grave.dateOfDeath)}
       </span>

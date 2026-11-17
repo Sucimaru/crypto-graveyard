@@ -158,6 +158,12 @@ async function doGet(url: string): Promise<DexPair[] | DexError> {
       return { kind: 'parse', message: `Invalid JSON from ${url}` };
     }
     const pairs = asObj(data).pairs;
+    if (pairs === null) {
+      // Dexscreener returns `pairs: null` when the queried addresses have no
+      // live pairs at all. That is a valid empty result (the tokens' pairs are
+      // gone), NOT an error — callers must not treat it as a failed fetch.
+      return [];
+    }
     if (!Array.isArray(pairs)) {
       return { kind: 'empty', message: `No pairs array in response from ${url}` };
     }

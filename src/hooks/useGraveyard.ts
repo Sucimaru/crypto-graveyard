@@ -67,7 +67,11 @@ export function useGraveyard(): UseGraveyardResult {
   const tokens = useMemo(
     () =>
       registry.map((t) =>
-        toBuriedToken(t, pairsByAddress?.get(t.contractAddress.toLowerCase())),
+        toBuriedToken(t, pairsByAddress?.get(t.contractAddress.toLowerCase()), {
+          // Only once the fetch has resolved (successfully) do we know a
+          // missing pair means "pair gone" rather than "not yet checked".
+          pairChecked: pairsByAddress !== null,
+        }),
       ),
     [registry, pairsByAddress],
   );

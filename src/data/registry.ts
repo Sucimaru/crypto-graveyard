@@ -31,8 +31,15 @@ export interface GraveToken {
  * The curated registry of dead tokens. At least 10 seed entries, spread across
  * real Dexscreener chain IDs and all three causes of death.
  *
- * Contract addresses are plausible-format values (EVM 0x-hex, Solana base58).
- * The data layer (task 3) degrades gracefully to "unreachable" when an address
+ * Contract addresses: 5 of the 12 were corrected 17 Nov 2026 after verifying
+ * each against the live Dexscreener API (search by name/symbol, then confirmed
+ * the candidate address returns live pairs via /latest/dex/tokens/): SQUID,
+ * CUMMIES, TIME, MIR, POLYDOGE. The other 7 (SFM, LUNA, BCC, PLEX, KIDS,
+ * SLOP, ARUG) have NO confirmed live pair for any matching token as of that
+ * date, so their addresses are left as-is and those tokens render as
+ * 'pair-gone'. Never invent an address to make a token look live — a token
+ * with no verifiable pair is pair-gone, not a reason to guess.
+ * The data layer (task 3) degrades gracefully to "pair-gone" when an address
  * does not resolve on Dexscreener, so illustrative addresses never crash the UI.
  */
 export const REGISTRY: readonly GraveToken[] = [
@@ -41,7 +48,7 @@ export const REGISTRY: readonly GraveToken[] = [
     name: 'Squid Game',
     symbol: 'SQUID',
     chainId: 'bsc',
-    contractAddress: '0x87230f1c33a4bc0a9a3d0f41591f1ae4c1c6b3a9',
+    contractAddress: '0x87230146E138d3F296a9a77e497A2A83012e9Bc5',
     peakPriceUsd: 2861.8,
     dateOfDeath: '2021-11-01',
     cause: 'rugged',
@@ -85,7 +92,7 @@ export const REGISTRY: readonly GraveToken[] = [
     name: 'CumRocket',
     symbol: 'CUMMIES',
     chainId: 'bsc',
-    contractAddress: '0x27c1f2c0af640a1d3e5d4f6e0c3a5b1f8d9e2a7b',
+    contractAddress: '0x27Ae27110350B98d564b9A3eeD31bAeBc82d878d',
     peakPriceUsd: 0.0325,
     dateOfDeath: '2021-05-04',
     cause: '-99%',
@@ -118,7 +125,7 @@ export const REGISTRY: readonly GraveToken[] = [
     name: 'Wonderland',
     symbol: 'TIME',
     chainId: 'avalanche',
-    contractAddress: '0xb54f16fb19e20b6f7a6f3a2c1d0e4b5a8c7d6e5f',
+    contractAddress: '0xb54f16fB19478766A268F172C9480f8da1a7c9C3',
     peakPriceUsd: 9843.0,
     dateOfDeath: '2022-01-10',
     cause: '-99%',
@@ -140,7 +147,7 @@ export const REGISTRY: readonly GraveToken[] = [
     name: 'Mirror Protocol',
     symbol: 'MIR',
     chainId: 'ethereum',
-    contractAddress: '0x09a3e1f2c4b5d6e7a8f0c1d2e3b4a5c6d7e8f902',
+    contractAddress: '0x09a3EcAFa817268f77BE1283176B946C4ff2E608',
     peakPriceUsd: 12.4,
     dateOfDeath: '2022-05-12',
     cause: 'rugged',
@@ -151,7 +158,7 @@ export const REGISTRY: readonly GraveToken[] = [
     name: 'PolyDoge',
     symbol: 'POLYDOGE',
     chainId: 'polygon',
-    contractAddress: '0x8a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b',
+    contractAddress: '0x8A953CfE442c5E8855cc6c61b1293FA648BAE472',
     peakPriceUsd: 0.000000041,
     dateOfDeath: '2022-08-09',
     cause: '-99%',

@@ -4,6 +4,7 @@ import {
   estimateSupply,
   valueLostUsd,
   reconstructPricePoints,
+  illustrativeDeclinePoints,
   toBuriedToken,
 } from './graveyard';
 import type { DexPair } from '../types';
@@ -177,6 +178,28 @@ describe('reconstructPricePoints', () => {
   });
 });
 
+describe('illustrativeDeclinePoints', () => {
+  it('draws a straight line from peak (24h before death) to 0 at death', () => {
+    const death = new Date('2022-01-01T00:00:00Z').getTime();
+    const pts = illustrativeDeclinePoints(100, '2022-01-01');
+    expect(pts).toHaveLength(2);
+    expect(pts[0]).toEqual({ t: death - 24 * 3600 * 1000, price: 100 });
+    expect(pts[1]).toEqual({ t: death, price: 0 });
+  });
+
+  it('returns [] for a zero peak', () => {
+    expect(illustrativeDeclinePoints(0, '2022-01-01')).toEqual([]);
+  });
+
+  it('returns [] for a null peak', () => {
+    expect(illustrativeDeclinePoints(null, '2022-01-01')).toEqual([]);
+  });
+
+  it('returns [] for an invalid date of death', () => {
+    expect(illustrativeDeclinePoints(100, 'not-a-date')).toEqual([]);
+  });
+});
+
 describe('toBuriedToken', () => {
   it('is unreachable with no derived fields when no pair is given', () => {
     const bt = toBuriedToken(makeToken());
@@ -199,6 +222,36 @@ describe('toBuriedToken', () => {
     const bt = toBuriedToken(makeToken(), makePair({ priceUsd: 'abc' }));
     expect(bt.status).toBe('unreachable');
     expect(bt.currentPriceUsd).toBeUndefined();
+  });
+});
+
+describe('toBuriedToken (pair-gone)', () => {
+  it('is pair-gone with drop -100 and no value lost when the fetch succeeded but returned no pair', () => {
+    const bt = toBuriedToken(makeToken({ peakPriceUsd: 100 }), undefined, {
+      pairChecked: true,
+    });
+    expect(bt.status).toBe('pair-gone');
+    expect(bt.pair).toBeUndefined();
+    expect(bt.currentPriceUsd).toBeUndefined();
+    expect(bt.dropFromPeakPct).toBe(-100);
+    expect(bt.valueLostUsd).toBeUndefined();
+    expect(bt.peakMarketCapUsd).toBeUndefined();
+    expect(bt.currentMarketCapUsd).toBeUndefined();
+  });
+
+  it('stays unreachable without pairChecked (fetch not yet resolved)', () => {
+    const bt = toBuriedToken(makeToken());
+    expect(bt.status).toBe('unreachable');
+    expect(bt.dropFromPeakPct).toBeUndefined();
+  });
+
+  it('is still live when a pair is given even with pairChecked', () => {
+    const bt = toBuriedToken(makeToken({ peakPriceUsd: 100 }), makePair(), {
+      pairChecked: true,
+    });
+    expect(bt.status).toBe('live');
+    expect(bt.currentPriceUsd).toBe(1);
+    expect(bt.dropFromPeakPct).toBeCloseTo(-99);
   });
 });
 

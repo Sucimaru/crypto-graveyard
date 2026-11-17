@@ -115,6 +115,34 @@ export function reconstructPricePoints(
 }
 
 /**
+ * Schematic decline for a token whose live pair is gone: a straight line from
+ * the curated peak price (24h before the date of death) down to ~$0 at the
+ * date of death.
+ *
+ * This is an ILLUSTRATION, not market data — there is no live price history
+ * for a pair-gone token, and the two points are the minimal straight-line
+ * schematic between the two facts the registry actually knows (peak price,
+ * date of death). The UI must label any chart drawn from these points
+ * "Illustrative — no live market data" and must never present them as real
+ * prices. Returns [] when the peak is missing/non-positive or the date of
+ * death is not a valid date.
+ */
+export function illustrativeDeclinePoints(
+  peakPriceUsd: number | null | undefined,
+  dateOfDeath: string,
+): PricePoint[] {
+  if (peakPriceUsd == null || !Number.isFinite(peakPriceUsd) || peakPriceUsd <= 0) {
+    return [];
+  }
+  const deathMs = new Date(dateOfDeath).getTime();
+  if (Number.isNaN(deathMs)) return [];
+  return [
+    { t: deathMs - 24 * HOUR_MS, price: peakPriceUsd },
+    { t: deathMs, price: 0 },
+  ];
+}
+
+/**
  * Join curated registry metadata with an optional live representative pair into
  * a `BuriedToken` view model.
  *
@@ -124,9 +152,29 @@ export function reconstructPricePoints(
  * populated only when their inputs are available, so a live pair without a
  * market cap still exposes `currentPriceUsd` / `dropFromPeakPct` but omits the
  * market-cap-dependent fields.
+ *
+ * The `pairChecked` option distinguishes "not yet looked up" from "looked up
+ * and found nothing": when the caller has completed a successful Dexscreener
+ * fetch (`pairChecked: true`) and no pair was returned for this token, the
+ * token is `'pair-gone'` — its market is gone, not merely unreachable.
+ * A pair-gone token reports `dropFromPeakPct: -100` by convention: with no
+ * live market the token is effectively worthless on any tracked market, so the
+ * fall from peak is ~-100%. That is an APPROXIMATION, not a measured price —
+ * the UI must always label it "pair gone — no live market" — and no
+ * `valueLostUsd` is computed (there is no current market cap to subtract
+ * from). Callers that have not finished a successful fetch leave
+ * `pairChecked` unset and get the old `'unreachable'` behaviour (initial
+ * render / fetch failure).
  */
-export function toBuriedToken(token: GraveToken, pair?: DexPair): BuriedToken {
+export function toBuriedToken(
+  token: GraveToken,
+  pair?: DexPair,
+  opts?: { pairChecked?: boolean },
+): BuriedToken {
   if (!pair) {
+    if (opts?.pairChecked) {
+      return { token, status: 'pair-gone', dropFromPeakPct: -100 };
+    }
     return { token, status: 'unreachable' };
   }
 

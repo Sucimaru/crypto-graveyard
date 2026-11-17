@@ -243,6 +243,16 @@ describe('fetchPairsForTokens', () => {
       const res = await fetchPairsForTokens(['0xt']);
       expect(res).toEqual(expect.objectContaining({ kind: 'empty' }));
     });
+
+    it('returns [] (not an error) when pairs is null — no live pairs exist', async () => {
+      fetchMock.mockResolvedValue(jsonResponse({ schemaVersion: '1.0.0', pairs: null }));
+      expect(await fetchPairsForTokens(['0xt'])).toEqual([]);
+    });
+
+    it('returns [] (not an error) when pairs is an empty array', async () => {
+      fetchMock.mockResolvedValue(jsonResponse({ schemaVersion: '1.0.0', pairs: [] }));
+      expect(await fetchPairsForTokens(['0xt'])).toEqual([]);
+    });
   });
 });
 

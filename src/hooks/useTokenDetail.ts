@@ -82,7 +82,8 @@ export function useTokenDetail(
         const rep = pickRepresentativePairs(result)[0];
         finish({
           status: 'found',
-          token: toBuriedToken(registryToken, rep),
+          // Successful fetch with no pair = pair-gone, not unreachable.
+          token: toBuriedToken(registryToken, rep, { pairChecked: true }),
           error: null,
         });
       });

@@ -3,10 +3,12 @@ import { Candle } from './components/Candle';
 import { Fog } from './components/Fog';
 import { GraveyardGrid } from './components/GraveyardGrid';
 import {
+  CauseFilter,
   SearchBar,
   filterGraveyard,
   isContractAddress,
 } from './components/SearchBar';
+import type { CauseFilterValue } from './components/SearchBar';
 import { StatsHeader } from './components/StatsHeader';
 import { TokenDetail } from './components/TokenDetail';
 import { Empty, Error, Loading, NotFound } from './components/states';
@@ -42,6 +44,7 @@ function parseHash(hash: string): Route {
 export default function App() {
   const { tokens, loading, liveResolved, error } = useGraveyard();
   const [query, setQuery] = useState('');
+  const [causeFilter, setCauseFilter] = useState<CauseFilterValue>('all');
   const [route, setRoute] = useState<Route>(() => parseHash(window.location.hash));
 
   useEffect(() => {
@@ -66,7 +69,22 @@ export default function App() {
   const detailQuery = route ? route.value : null;
   const detail = useTokenDetail(detailQuery, tokens);
 
-  const filtered = useMemo(() => filterGraveyard(query, tokens), [query, tokens]);
+  const filtered = useMemo(
+    () => filterGraveyard(query, tokens, causeFilter),
+    [query, tokens, causeFilter],
+  );
+  const causeCounts = useMemo(() => {
+    const counts: Record<CauseFilterValue, number> = {
+      all: tokens.length,
+      rugged: 0,
+      abandoned: 0,
+      '-99%': 0,
+    };
+    for (const t of tokens) {
+      counts[t.token.cause] += 1;
+    }
+    return counts;
+  }, [tokens]);
   const queryIsAddress = query.trim() !== '' && isContractAddress(query);
   const showAddressLookup = query.trim() !== '' && filtered.length === 0 && queryIsAddress;
   const showEmpty = query.trim() !== '' && filtered.length === 0 && !queryIsAddress;
@@ -101,6 +119,11 @@ export default function App() {
             <div className="flex flex-col gap-6">
               <StatsHeader registryCount={tokens.length} tokens={tokens} />
               <SearchBar value={query} onChange={setQuery} />
+              <CauseFilter
+                value={causeFilter}
+                onChange={setCauseFilter}
+                counts={causeCounts}
+              />
               {error && liveResolved ? (
                 <p role="status" className="text-center text-sm text-[var(--graveyard-text-dim)]">
                   Live prices are unavailable right now — showing registry data.

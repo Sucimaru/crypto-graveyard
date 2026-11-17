@@ -33,7 +33,9 @@ export interface DexPair {
 /**
  * Joined view model: curated registry metadata plus an optional live
  * representative pair. Derived numeric fields are populated only when live data
- * is present (status === 'live'); a token without live data is 'unreachable'.
+ * is present (status === 'live'); a token without live data is 'unreachable'
+ * while the fetch is still pending/failed, or 'pair-gone' once a successful
+ * fetch confirmed Dexscreener has no live pair for it at all.
  */
 export interface BuriedToken {
   /** Curated metadata from the registry. */
@@ -41,14 +43,28 @@ export interface BuriedToken {
   /** Live representative pair (highest liquidity), if any. */
   pair?: DexPair;
   currentPriceUsd?: number;
-  /** Signed: (current - peak) / peak * 100, e.g. -99.7. */
+  /**
+   * Signed: (current - peak) / peak * 100, e.g. -99.7.
+   * For 'pair-gone' tokens this is -100 by convention (see `toBuriedToken`):
+   * no live market means the token is effectively worthless on any tracked
+   * market — an approximation the UI always labels as such, never a measured
+   * price.
+   */
   dropFromPeakPct?: number;
   /** supply * peakPrice. */
   peakMarketCapUsd?: number;
   currentMarketCapUsd?: number;
   /** peakMarketCap - currentMarketCap. */
   valueLostUsd?: number;
-  status: 'live' | 'unreachable';
+  /**
+   * 'live' — a pair with a usable price was found.
+   * 'unreachable' — live data not yet resolved (fetch pending) or the fetch
+   *   itself failed; the card renders registry-only data with "price unknown".
+   * 'pair-gone' — the fetch SUCCEEDED but Dexscreener returned no pair for
+   *   this token: its market is gone. Distinct from 'unreachable' so the UI
+   *   can say so honestly instead of blaming the network.
+   */
+  status: 'live' | 'unreachable' | 'pair-gone';
 }
 
 /** Typed error returned by the Dexscreener client instead of throwing. */

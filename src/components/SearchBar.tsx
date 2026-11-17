@@ -25,7 +25,18 @@
  * layer (`lib/graveyard.ts`, `lib/dexscreener.ts`).
  */
 
-import type { GraveToken } from '../data/registry';
+import type { CauseOfDeath, GraveToken } from '../data/registry';
+
+/** Cause filter value for the grid: one real cause, or 'all' for no filtering. */
+export type CauseFilterValue = CauseOfDeath | 'all';
+
+/** Chip labels for the cause filter. */
+export const CAUSE_FILTER_LABELS: Record<CauseFilterValue, string> = {
+  all: 'All',
+  rugged: 'Rugged',
+  abandoned: 'Abandoned',
+  '-99%': 'Down 99%',
+};
 
 /* -------------------------------------------------------------------------- */
 /* Contract-address detection (Requirement 3.3)                              */
@@ -64,6 +75,11 @@ export function isContractAddress(query: string): boolean {
  * contract address (Requirement 3.1). An empty/whitespace query returns a fresh
  * shallow copy of every token, so empty queries restore all cards.
  *
+ * The optional `cause` narrows the result to one cause of death ('all' keeps
+ * every cause) and composes with the text query: both filters apply at once,
+ * so "squid" + "rugged" matches only rugged tokens whose name/symbol/address
+ * contains "squid".
+ *
  * Generic over the token-bearing view model so it filters the live-enriched
  * `BuriedToken[]` the grid renders, matching against the underlying curated
  * `token` metadata (not live fields). A copy is returned even when filtering so
@@ -72,15 +88,18 @@ export function isContractAddress(query: string): boolean {
 export function filterGraveyard<T extends { token: GraveToken }>(
   query: string,
   tokens: readonly T[],
+  cause: CauseFilterValue = 'all',
 ): T[] {
   const q = query.trim().toLowerCase();
-  if (!q) return [...tokens];
-  return tokens.filter(
-    (t) =>
+  return tokens.filter((t) => {
+    if (cause !== 'all' && t.token.cause !== cause) return false;
+    if (!q) return true;
+    return (
       t.token.name.toLowerCase().includes(q) ||
       t.token.symbol.toLowerCase().includes(q) ||
-      t.token.contractAddress.toLowerCase().includes(q),
-  );
+      t.token.contractAddress.toLowerCase().includes(q)
+    );
+  });
 }
 
 /* -------------------------------------------------------------------------- */
@@ -147,6 +166,58 @@ export function SearchBar({
           className="w-full rounded-2xl border border-graveyard-border bg-graveyard-surface py-3 pl-10 pr-4 font-serif text-base text-graveyard-stone-light placeholder:text-graveyard-stone-dim focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-graveyard-stone-light"
         />
       </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Cause filter chips (post-launch fix 16: "filter by cause of death")       */
+/* -------------------------------------------------------------------------- */
+
+export interface CauseFilterProps {
+  /** Currently selected cause ('all' = no filtering). */
+  value: CauseFilterValue;
+  /** Called with the newly selected cause when a chip is activated. */
+  onChange: (value: CauseFilterValue) => void;
+  /** Token counts per cause, plus the 'all' total, rendered on the chips. */
+  counts: Record<CauseFilterValue, number>;
+}
+
+const CAUSE_FILTER_ORDER: CauseFilterValue[] = ['all', 'rugged', 'abandoned', '-99%'];
+
+/**
+ * A row of toggle chips filtering the grid by cause of death. Only the three
+ * causes that actually exist in the registry are offered — there is no
+ * 'hacked' chip because no registry token has that cause, and inventing a
+ * filter for a cause with zero graves would be misleading. The active chip
+ * uses `aria-pressed` so its state is exposed to assistive tech; counts are
+ * computed by the parent from the registry-derived token list.
+ */
+export function CauseFilter({ value, onChange, counts }: CauseFilterProps) {
+  return (
+    <div
+      role="group"
+      aria-label="Filter by cause of death"
+      className="flex flex-wrap items-center gap-2"
+    >
+      {CAUSE_FILTER_ORDER.map((cause) => {
+        const active = value === cause;
+        return (
+          <button
+            key={cause}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(cause)}
+            className={
+              active
+                ? 'rounded-full border border-[var(--graveyard-text)] bg-[var(--graveyard-surface-2)] px-3 py-1 text-sm font-medium text-[var(--graveyard-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--graveyard-text)]'
+                : 'rounded-full border border-graveyard-border bg-graveyard-surface px-3 py-1 text-sm text-graveyard-stone-dim hover:text-[var(--graveyard-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-graveyard-stone-light'
+            }
+          >
+            {CAUSE_FILTER_LABELS[cause]} ({counts[cause]})
+          </button>
+        );
+      })}
     </div>
   );
 }

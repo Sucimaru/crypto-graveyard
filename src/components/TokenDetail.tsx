@@ -15,7 +15,7 @@
  */
 
 import type { CauseOfDeath } from '../data/registry';
-import { reconstructPricePoints } from '../lib/graveyard';
+import { illustrativeDeclinePoints, reconstructPricePoints } from '../lib/graveyard';
 import type { BuriedToken } from '../types';
 import { PriceChart } from './PriceChart';
 
@@ -91,6 +91,7 @@ export function TokenDetail({ token, onBack }: TokenDetailProps) {
   const grave = token.token;
   const causeLabel = CAUSE_LABELS[grave.cause] ?? 'Unknown';
   const accentClass = CAUSE_ACCENT_CLASS[grave.cause] ?? '';
+  const isPairGone = token.status === 'pair-gone';
   const peakLabel =
     Number.isFinite(grave.peakPriceUsd) && grave.peakPriceUsd > 0
       ? formatUsd(grave.peakPriceUsd)
@@ -102,13 +103,25 @@ export function TokenDetail({ token, onBack }: TokenDetailProps) {
   const currentLabel =
     token.status === 'live' && token.currentPriceUsd !== undefined
       ? formatUsd(token.currentPriceUsd)
-      : 'price unknown';
-  const dropLabel =
-    token.dropFromPeakPct !== undefined ? `${token.dropFromPeakPct.toFixed(1)}%` : '—';
-  const points = reconstructPricePoints(
-    token.pair?.priceUsd ?? null,
-    token.pair?.priceChange ?? { m5: 0, h1: 0, h6: 0, h24: 0 },
-  );
+      : isPairGone
+        ? 'pair gone — no live market'
+        : 'price unknown';
+  const dropLabel = isPairGone
+    ? '≈ -100%'
+    : token.dropFromPeakPct !== undefined
+      ? `${token.dropFromPeakPct.toFixed(1)}%`
+      : '—';
+  // Pair-gone tokens have no live series: show the schematic peak → ~$0
+  // decline instead, always labelled illustrative (see graveyard.ts).
+  const points = isPairGone
+    ? illustrativeDeclinePoints(grave.peakPriceUsd, grave.dateOfDeath)
+    : reconstructPricePoints(
+        token.pair?.priceUsd ?? null,
+        token.pair?.priceChange ?? { m5: 0, h1: 0, h6: 0, h24: 0 },
+      );
+  const chartAccessibleLabel = isPairGone
+    ? `Illustrative decline from peak ${peakLabel} to zero at death, no live market data`
+    : undefined;
 
   return (
     <article
@@ -170,7 +183,7 @@ export function TokenDetail({ token, onBack }: TokenDetailProps) {
             Pair age
           </dt>
           <dd className="text-[var(--graveyard-text)]">
-            {formatPairAge(token.pair?.pairCreatedAt)}
+            {isPairGone ? 'pair gone' : formatPairAge(token.pair?.pairCreatedAt)}
           </dd>
         </div>
         <div className="col-span-2 sm:col-span-2">
@@ -185,9 +198,19 @@ export function TokenDetail({ token, onBack }: TokenDetailProps) {
 
       <div>
         <h3 className="mb-1 text-xs uppercase tracking-wider text-[var(--graveyard-text-dim)]">
-          Last 24 hours
+          {isPairGone ? 'Decline to death (illustrative)' : 'Last 24 hours'}
         </h3>
-        <PriceChart points={points} peakPriceUsd={peakForChart} />
+        <PriceChart
+          points={points}
+          peakPriceUsd={peakForChart}
+          accessibleLabel={chartAccessibleLabel}
+        />
+        {isPairGone ? (
+          <p className="mt-1 text-xs text-[var(--graveyard-text-dim)]">
+            Illustrative — no live market data. This line shows the schematic
+            fall from peak to ~$0 at death, not real prices.
+          </p>
+        ) : null}
       </div>
 
       {token.pair ? (

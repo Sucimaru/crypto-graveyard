@@ -102,7 +102,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: grid shell renders instantly from the registry; live prices update without flicker; API failure leaves registry-only cards intact.
     - _Requirements: 1.3, 1.4, 4.2, 4.3, 6.3, 7.1, 7.2_
 
-- [ ] 14. Implement the useTokenDetail hook and contract-address search
+- [x] 14. Implement the useTokenDetail hook and contract-address search
     - Create `src/hooks/useTokenDetail.ts` that resolves a token by `id` against the registry first, returning its `BuriedToken` (preferring cached live data from `useGraveyard`/the Dexscreener cache).
     - For a contract-address query with no registry match, call `searchPairs`/`fetchPairsForTokens` and build a `BuriedToken`-shaped object with `cause` and peak marked "Unknown"; surface a `NotFound` result when no pairs are returned.
     - Verify: opening a registry token shows full details; opening an arbitrary contract address shows live price and "Unknown" cause/peak; a bad address shows "no grave found".

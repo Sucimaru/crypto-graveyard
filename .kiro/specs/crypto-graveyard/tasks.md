@@ -2,7 +2,7 @@
 
 Tasks are ordered so each builds on prior ones. Each task should be verifiable on its own (type-check / lint / unit test / render) before moving on. Do not begin a task that depends on an incomplete earlier task.
 
-- [ ] 1. Scaffold the Vite + React + TypeScript + Tailwind project
+- [x] 1. Scaffold the Vite + React + TypeScript + Tailwind project
     - Create the Vite React-TS app at the repo root and add Tailwind CSS (v3) with PostCSS.
     - Enable TypeScript strict mode in `tsconfig.json`; add a `typecheck` script (`tsc --noEmit`).
     - Add `src/theme/index.css` with the Tailwind directives and a dark graveyard base palette (near-black background, muted stone text colors); leave keyframe placeholders for fog and flicker (filled in task 5).

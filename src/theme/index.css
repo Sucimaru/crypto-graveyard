@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Crypto Graveyard — base theme.
+ *
+ * Defines the dark graveyard palette (near-black background, muted stone text)
+ * as CSS variables for direct use and mirrors the Tailwind `graveyard` color
+ * tokens. The fog-drift and candle-flicker keyframes are left as no-op
+ * placeholders here and finalized in task 5 (with a prefers-reduced-motion
+ * guard).
+ */
+
+:root {
+  color-scheme: dark;
+
+  --graveyard-bg: #0a0b0d;
+  --graveyard-surface: #101216;
+  --graveyard-surface-2: #161a1f;
+  --graveyard-border: #23262c;
+
+  --stone: #9ca3a0;
+  --stone-light: #c8ccc7;
+  --stone-dim: #6b7270;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--graveyard-bg);
+    color: var(--stone);
+    font-family: Georgia, 'Times New Roman', serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Keyframe placeholders — finalized in task 5 (fog + candle motion).  */
+/* Reduced-motion guard is added in task 5 alongside the real frames. */
+/* ------------------------------------------------------------------ */
+@keyframes fog-drift {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes candle-flicker {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+  }
+}

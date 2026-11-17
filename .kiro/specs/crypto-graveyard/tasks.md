@@ -28,7 +28,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: unit tests with mocked `fetch` cover batching, 60s cache hit, single-flight, highest-liquidity selection, and error typing.
     - _Requirements: 6.1, 6.2, 6.3, 6.5_
 
-- [ ] 4. Implement and unit-test the graveyard derived computations
+- [x] 4. Implement and unit-test the graveyard derived computations
     - Create `src/lib/graveyard.ts` with pure functions: `dropFromPeak`, `estimateSupply`, `valueLostUsd`, and `reconstructPricePoints` (the 5-point series from `priceUsd` + the m5/h1/h6/h24 `priceChange` buckets, as specified in the design).
     - Add a `toBuriedToken(token: GraveToken, pair?: DexPair)` joiner that returns a `BuriedToken` with `status: 'live' | 'unreachable'`, populating `currentPriceUsd`, `dropFromPeakPct`, `peakMarketCapUsd`, `currentMarketCapUsd`, and `valueLostUsd` only when live data is present.
     - Write unit tests for each function, including edge cases: zero/negative peak, missing market cap, null `priceUsd`, and a 24h change of `-100` (guard division by zero).

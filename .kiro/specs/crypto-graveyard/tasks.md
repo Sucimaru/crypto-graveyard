@@ -57,7 +57,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: renders correctly for a `live` token and an `unreachable` token; keyboard focus and activation work.
     - _Requirements: 1.2, 1.3, 1.4, 5.2, 8.1, 8.2_
 
-- [ ] 8. Build the GraveyardGrid component
+- [x] 8. Build the GraveyardGrid component
     - Create `src/components/GraveyardGrid.tsx` that renders a responsive CSS grid of `TombstoneCard`s from a `BuriedToken[]`.
     - Use semantic landmarks (`role="list"`/`listitem` or a labelled region) and keep text legible across mobile, tablet, and desktop widths (Tailwind responsive utilities).
     - Show per-card loading placeholders while live data is still resolving, without blocking the grid shell.

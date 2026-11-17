@@ -94,7 +94,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: all fields render for a live token; an unreachable token shows "price unknown" without layout breakage; the Dexscreener link opens the pair page.
     - _Requirements: 2.1, 2.3, 2.4, 8.1_
 
-- [ ] 13. Implement the useGraveyard hook
+- [x] 13. Implement the useGraveyard hook
     - Create `src/hooks/useGraveyard.ts` that reads the registry synchronously and fetches live pairs via the Dexscreener client (task 3), batching registry addresses.
     - On mount, immediately expose `BuriedToken[]` with `status: 'unreachable'` (registry-only) so the grid shell renders before the network resolves (progressive rendering).
     - When live pairs resolve, join via `toBuriedToken` (task 4) and update state, marking failed tokens `unreachable`.

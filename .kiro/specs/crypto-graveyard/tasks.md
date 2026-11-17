@@ -64,7 +64,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: reflows cleanly at common breakpoints; cards remain readable and operable.
     - _Requirements: 1.1, 7.2, 8.2, 8.3_
 
-- [ ] 9. Build the StatsHeader component
+- [x] 9. Build the StatsHeader component
     - Create `src/components/StatsHeader.tsx` accepting the registry token count and the list of `BuriedToken`s with live data.
     - Display "Tokens Buried" (registry count) and "Total Value Lost" (sum of `valueLostUsd` over live tokens), formatted as compact USD.
     - Label the figure when some tokens lack live data (e.g. "based on N of M live graves").

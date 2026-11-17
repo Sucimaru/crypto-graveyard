@@ -10,7 +10,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: `npm run dev` starts and `npm run build` + `tsc --noEmit` pass.
     - _Requirements: 5.1_
 
-- [ ] 2. Define domain types and the curated graveyard registry
+- [x] 2. Define domain types and the curated graveyard registry
     - In `src/data/registry.ts`, define `CauseOfDeath` (`'rugged' | 'abandoned' | '-99%'`) and `GraveToken` per the design data model.
     - Populate the registry array with at least 10 seed dead tokens, each with `id`, `name`, `symbol`, `chainId`, `contractAddress`, `peakPriceUsd`, `dateOfDeath` (ISO), `cause`, and optional `lore`; use real chain IDs (e.g. `ethereum`, `bsc`, `solana`) and plausible contract addresses.
     - Export a `getRegistry()` / `REGISTRY` accessor and a case-insensitive lookup helper by name/symbol/contract.

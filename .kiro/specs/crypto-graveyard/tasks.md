@@ -42,7 +42,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: app background is near-black with the fog overlay; toggling OS reduced motion stops the animation.
     - _Requirements: 5.1, 5.3_
 
-- [ ] 6. Create the shared UI states
+- [x] 6. Create the shared UI states
     - Create `src/components/states.tsx` exporting `Loading`, `Error`, `Empty`, and `NotFound` components, all themed to the graveyard palette.
     - `Loading` is small enough to render inside a tombstone card (per-card skeleton/price-unknown state).
     - `NotFound` takes a message and is used for the contract-search "no grave found" case.

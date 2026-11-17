@@ -108,7 +108,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: opening a registry token shows full details; opening an arbitrary contract address shows live price and "Unknown" cause/peak; a bad address shows "no grave found".
     - _Requirements: 2.1, 3.3, 7.3_
 
-- [ ] 15. Wire the App, routing, and final accessibility/responsive pass
+- [x] 15. Wire the App, routing, and final accessibility/responsive pass
     - In `src/App.tsx`, compose `StatsHeader`, `SearchBar`, `GraveyardGrid`, `TokenDetail`, `Fog`, `Candle`, and the shared states.
     - Implement grid ↔ detail view switching driven by local state and reflected in the URL hash (e.g. `#/token/<id>` or `#/addr/<address>`) so detail links are shareable; back action restores the grid (including the active search filter).
     - Connect `SearchBar` contract-address queries to the `useTokenDetail` fallback path and the `NotFound` state.

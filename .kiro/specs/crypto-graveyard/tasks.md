@@ -115,3 +115,13 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Run the final accessibility pass: keyboard tab order across header, search, cards, and detail; ARIA labels on grid, cards, chart, and stats; contrast checks against the dark palette; and responsive reflow at mobile/tablet/desktop.
     - Verify: `npm run build`, `tsc --noEmit`, unit tests, and a manual smoke flow (load → search → open detail → back) all pass.
     - _Requirements: 1.5, 2.4, 3.2, 3.3, 7.1, 7.3, 8.1, 8.2, 8.3_
+
+- [x] 16. Post-launch fix: match the app to the submitted Devpost description (manual, Kiro limit exhausted)
+    - Treat Dexscreener `pairs: null` as a valid empty result in `doGet` (`src/lib/dexscreener.ts`), not a DexError — the "Live prices are unavailable" notice now appears only on real network/HTTP/parse failures.
+    - Add a `pair-gone` status to `BuriedToken` (`src/types.ts`, `src/lib/graveyard.ts` `toBuriedToken` with `{ pairChecked }`): a token whose fetch succeeded but returned no pair shows drop ≈ -100% (labelled approximation, never a measured price) and no value-lost computation. `useGraveyard`/`useTokenDetail` pass `pairChecked: true` only after a successful fetch.
+    - Add cause-filter chips (All / Rugged / Abandoned / Down 99%) in `CauseFilter` (`src/components/SearchBar.tsx`), composable with the text search via extended `filterGraveyard(query, tokens, cause)`; wired in `App.tsx` with per-cause counts. No 'hacked' chip — no registry token has that cause.
+    - Verify + correct registry addresses against live Dexscreener (search, then `/latest/dex/tokens/` confirmation): SQUID → 0x87230146E138d3F296a9a77e497A2A83012e9Bc5, CUMMIES → 0x27Ae27110350B98d564b9A3eeD31bAeBc82d878d, TIME → 0xb54f16fB19478766A268F172C9480f8da1a7c9C3, MIR → 0x09a3EcAFa817268f77BE1283176B946C4ff2E608, POLYDOGE → 0x8A953CfE442c5E8855cc6c61b1293FA648BAE472. The other 7 addresses left as-is (no confirmed live pair) and render as pair-gone.
+    - Pair-gone detail view (`TokenDetail.tsx`, `PriceChart.tsx` `accessibleLabel` prop): illustrative peak → ~$0 decline via `illustrativeDeclinePoints`, heading "Decline to death (illustrative)" + caption "Illustrative — no live market data". `TombstoneCard.tsx` shows "pair gone — no live market" and "≈ -100%".
+    - Tests: `pairs: null` → `[]`, pair-gone status, illustrative points, cause filter (69/69 Vitest lolos, tsc bersih).
+    - Verify: `npm run build` lolos; commit 3307f85 pushed to main; redeployed to GitHub Pages (gh-pages fc8ca87); live smoke test Playwright 20/20 PASS — 5 live / 7 pair-gone, filter chips + search compose, detail live vs pair-gone benar, notice "Live prices are unavailable" hilang.
+    - _Requirements: 1.2, 1.3, 2.1, 2.2, 3.1, 4.1, 4.2, 4.3, 6.1_

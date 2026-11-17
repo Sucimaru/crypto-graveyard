@@ -80,7 +80,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: filtering narrows the grid; empty queries restore all cards; non-matching query shows the empty state.
     - _Requirements: 3.1, 3.2, 3.3, 8.1_
 
-- [ ] 11. Build the PriceChart component
+- [x] 11. Build the PriceChart component
     - Create `src/components/PriceChart.tsx` as a self-contained SVG sparkline (no chart library) from `reconstructPricePoints` output.
     - Render an axis-free area/line chart scaled to min/max price, and mark the registry peak price with a distinct marker/line (and an "Unknown" marker when peak is absent, e.g. contract-search tokens).
     - Give the chart an accessible name summarizing the data (e.g. "Price over the last 24 hours, peak $X").

@@ -72,7 +72,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: totals update as live data resolves; partial-data label appears when some tokens are unreachable.
     - _Requirements: 4.1, 4.2, 4.3, 8.2_
 
-- [ ] 10. Build the SearchBar and grid filtering
+- [x] 10. Build the SearchBar and grid filtering
     - Create `src/components/SearchBar.tsx` with a controlled input; make it focusable and labelled.
     - Implement client-side filtering: case-insensitive substring match against name, symbol, and contract address over the registry.
     - Detect contract-address patterns (EVM `0x...` and Solana base58) to trigger the Dexscreener fallback path (wired in task 14).

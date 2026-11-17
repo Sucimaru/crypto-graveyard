@@ -18,7 +18,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: `tsc --noEmit` passes and the registry array length is ≥ 10.
     - _Requirements: 6.4_
 
-- [ ] 3. Build the Dexscreener client with caching and batching
+- [x] 3. Build the Dexscreener client with caching and batching
     - Create `src/lib/dexscreener.ts` with base URL `https://api.dexscreener.com`.
     - Implement `fetchPairsForTokens(addresses: string[]): Promise<DexPair[]>` that batches addresses into ≤30-per-request groups, calls `GET /latest/dex/tokens/{addrs}`, and normalizes `pairs` into `DexPair[]`.
     - Implement `searchPairs(query: string): Promise<DexPair[]>` against `GET /latest/dex/search?q=`.

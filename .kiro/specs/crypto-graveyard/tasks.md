@@ -87,7 +87,7 @@ Tasks are ordered so each builds on prior ones. Each task should be verifiable o
     - Verify: renders five points plus the peak marker; tolerates a single-point series without breaking.
     - _Requirements: 2.2, 8.2_
 
-- [ ] 12. Build the TokenDetail view
+- [x] 12. Build the TokenDetail view
     - Create `src/components/TokenDetail.tsx` accepting a `BuriedToken` (or a contract-search token with `cause`/peak "Unknown").
     - Render name, symbol, chain, contract address, peak price, current price, drop % from peak, date of death, cause, the `PriceChart` (task 11), pair age from `pairCreatedAt`, and a link to the Dexscreener `pair.url`.
     - Provide a visible back action (button/hash-aware link) that returns to the grid (wired in task 14).
